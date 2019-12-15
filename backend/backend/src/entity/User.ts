@@ -1,26 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from "typeorm";
-
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, BaseEntity } from "typeorm";
+import { Field, ObjectType } from "type-graphql";
 import { Message } from "./Message";
 import { Team } from "./Team";
 
-@Entity()
-export class User {
+
+
+@ObjectType()
+@Entity("users")
+export class User extends BaseEntity{
+
+  @Field(() => String)
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
   
+  
+  @Field()
   @Index({ unique: true })
   @Column()
-  userName: string;
+  user_name: string;
 
-  @Column()
-  firstName: string;
-
+  @Field()
   @Column()
   password: string;
 
+  
+  @Field()
   @Index({ unique: true })
   @Column()
   email: string;
+
+
+  @CreateDateColumn()
+  created_at: string;
+
+  @UpdateDateColumn()
+  updated_at: string;
 
   // associations
 
@@ -30,9 +44,5 @@ export class User {
   @OneToMany(() => Team, team => team.owner)
   ownedTeams: Team [];
 
-  @CreateDateColumn()
-  created_at: string;
 
-  @UpdateDateColumn()
-  updated_at: string;
 }

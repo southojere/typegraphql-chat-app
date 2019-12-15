@@ -3,7 +3,7 @@ import { User } from "./User";
 import { Channel } from "./Channel";
 
 
-@Entity()
+@Entity("teams")
 export class Team {
   @PrimaryGeneratedColumn()
   id: number;
