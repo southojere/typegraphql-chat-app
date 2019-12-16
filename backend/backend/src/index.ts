@@ -3,9 +3,9 @@ import { createConnection } from "typeorm";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { HelloWorldResolver } from "./resolvers/HelloWorldResolver";
 import { UserResolver } from "./resolvers/user";
 import { MessageResolver } from "./resolvers/message";
+import { TeamResolver } from "./resolvers/team";
 import dotenv from "dotenv";
 (async () => {
   dotenv.config();
@@ -35,7 +35,7 @@ import dotenv from "dotenv";
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloWorldResolver, UserResolver, MessageResolver],
+      resolvers: [TeamResolver, UserResolver, MessageResolver],
       validate: true
     }),
     context: ({ req, res }) => ({ req, res })
