@@ -1,6 +1,6 @@
 import { Resolver, Mutation, Arg, Int } from "type-graphql";
 import { Team } from "../entity/Team";
-import { Channel } from "src/entity/Channel";
+import { Channel } from "../entity/Channel";
 
 @Resolver()
 class ChannelResolver {
