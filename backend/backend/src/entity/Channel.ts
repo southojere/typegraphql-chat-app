@@ -19,7 +19,9 @@ export class Channel extends BaseEntity{
 
   
   @Field()
-  @Column()
+  @Column({
+    default: false
+  })
   public: boolean;
 
   

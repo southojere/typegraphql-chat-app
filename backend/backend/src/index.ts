@@ -36,9 +36,18 @@ import dotenv from "dotenv";
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [TeamResolver, UserResolver, MessageResolver],
-      validate: true
+      validate: true,
     }),
-    context: ({ req, res }) => ({ req, res })
+    context: ({ req }) => {
+      const context = {
+        req,
+        user: {
+          id: 1
+        }
+        // user: req.user, // `req.user` comes from `express-jwt`
+      };
+      return context;
+    },
   });
 
   apolloServer.applyMiddleware({ app, cors: false });
