@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Arg } from "type-graphql";
+import { Resolver, Mutation, Arg, Query } from "type-graphql";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 
@@ -16,9 +16,12 @@ class TeamResolver {
     }).save();
   }
 
-//   owner() {
-//     return;
-//   }
+  @Query(() => [Team])
+  teams() {
+    return Team.find()
+  }
+
+  //TODO - query to get owner
 
 }
 

@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, Query, InputType, Field } from "type-graphql";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 import { User } from "../entity/User";
 
 @InputType()
@@ -16,21 +16,28 @@ class UserInput {
 class UserResolver {
   // MUTATIONS
   @Mutation(() => User)
-   async createUser(@Arg("options", () => UserInput) options: UserInput) {
-
-
-    const hashPassword = await bcrypt.hash(options.password,10)
+  async createUser(@Arg("options", () => UserInput) options: UserInput) {
+    const hashPassword = await bcrypt.hash(options.password, 10);
     return User.create({
       user_name: options.username,
       email: options.email,
-      password: hashPassword,
-    }).save()
+      password: hashPassword
+    }).save();
   }
 
   // QUERYS
   @Query(() => [User])
   users() {
     return User.find();
+  }
+
+  @Query(() => User)
+   user(@Arg("user_id") id: string) {
+    return User.findOne({
+      where: {
+        id
+      }
+    });
   }
 }
 
