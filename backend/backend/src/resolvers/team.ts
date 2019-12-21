@@ -1,16 +1,21 @@
-import { Resolver, Mutation, Arg, Query } from "type-graphql";
+import { Resolver, Mutation, Arg, Query, Ctx } from "type-graphql";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 
-@Resolver()
+const options = { relations: ["owner"] };
+
+@Resolver(() => Team)
 class TeamResolver {
+
+
   @Mutation(() => Team)
-  async createTeam(@Arg("name") name: string) {
+//   @Authorized()
+  async createTeam(@Arg("name") name: string, @Ctx("user") user: User) {
     return Team.create({
       name: name,
-      owner: await User.findOne({ // TODO: replace once context user is provided
+      owner: await User.findOne({
         where: {
-          id: 'fb6e5dd7-ce72-4a78-b90d-5f85e28268bf' // TODO: fix this
+          id: user.id
         }
       })
     }).save();
@@ -18,11 +23,20 @@ class TeamResolver {
 
   @Query(() => [Team])
   teams() {
-    return Team.find()
+    return Team.find({
+      ...options
+    });
   }
 
-  //TODO - query to get owner
-
+  @Query(() => Team)
+  team(@Arg("teamId") teamId: number) {
+    return Team.findOne({
+      where: {
+        id: teamId
+      },
+      ...options
+    });
+  }
 }
 
 export { TeamResolver };

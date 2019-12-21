@@ -10,7 +10,7 @@ import { Team } from "./Team";
 export class User extends BaseEntity{
 
   @Field(() => String)
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn()
   id: string;
   
   
