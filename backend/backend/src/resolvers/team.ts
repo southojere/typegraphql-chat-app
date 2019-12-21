@@ -16,9 +16,10 @@ class TeamResolver {
     }).save();
   }
 
-  owner() {
-    return;
-  }
+//   owner() {
+//     return;
+//   }
+
 }
 
 export { TeamResolver };
