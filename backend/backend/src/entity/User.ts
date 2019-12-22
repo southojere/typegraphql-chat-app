@@ -38,9 +38,11 @@ export class User extends BaseEntity{
 
   // associations
 
+  @Field(() => [Message])
   @OneToMany(() => Message, message => message.user)
   messages: Message[];
 
+  @Field(() => [Team])
   @OneToMany(() => Team, team => team.owner)
   ownedTeams: Team [];
 

@@ -2,14 +2,12 @@ import { Resolver, Mutation, Arg, Query, Ctx } from "type-graphql";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 
-const options = { relations: ["owner"] };
+const options = { relations: ["owner", "channels"] };
 
 @Resolver(() => Team)
 class TeamResolver {
-
-
   @Mutation(() => Team)
-//   @Authorized()
+  //   @Authorized()
   async createTeam(@Arg("name") name: string, @Ctx("user") user: User) {
     return Team.create({
       name: name,

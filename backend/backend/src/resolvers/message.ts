@@ -1,11 +1,19 @@
-import { Resolver, Mutation, Arg } from "type-graphql";
+import { Resolver, Mutation, Arg, Ctx } from "type-graphql";
+import { User } from "../entity/User";
+import { Message } from "../entity/Message";
+import { findUserById } from "../entity/queries/user";
 
 @Resolver()
 class MessageResolver {
-  @Mutation(() => Boolean)
-  createMessage(@Arg("userId") id: string, @Arg("message") message: string) {
-      console.log(id, message)
-      return true
+  @Mutation(() => Message)
+  async createMessage(
+    @Ctx("user") user: User,
+    @Arg("message") message: string
+  ) {
+    return Message.create({
+      msg: message,
+      user: await findUserById(parseInt(user.id, 10))
+    }).save();
   }
 }
 

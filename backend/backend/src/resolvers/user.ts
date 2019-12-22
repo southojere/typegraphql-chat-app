@@ -1,6 +1,8 @@
 import { Resolver, Mutation, Arg, Query, InputType, Field } from "type-graphql";
 import bcrypt from "bcrypt";
 import { User } from "../entity/User";
+import { findOrCreateUser } from "../entity/commands/user";
+import { findUserByEmail, findUserById } from "../entity/queries/user";
 
 @InputType()
 class UserInput {
@@ -12,32 +14,34 @@ class UserInput {
   password: string;
 }
 
+const options = { relations: ["ownedTeams"] };
+
 @Resolver()
 class UserResolver {
   // MUTATIONS
   @Mutation(() => User)
   async createUser(@Arg("options", () => UserInput) options: UserInput) {
     const hashPassword = await bcrypt.hash(options.password, 10);
-    return User.create({
+    const existingUser = await findUserByEmail(options.email)
+    if(existingUser) {
+        throw new Error(`User already exists with this email (${options.email})`)
+    }
+    return findOrCreateUser({
       user_name: options.username,
-      email: options.email,
-      password: hashPassword
-    }).save();
+      password: hashPassword,
+      email: options.email
+    });
   }
 
   // QUERYS
   @Query(() => [User])
   users() {
-    return User.find();
+    return User.find({ ...options });
   }
 
   @Query(() => User)
-   user(@Arg("user_id") id: string) {
-    return User.findOne({
-      where: {
-        id
-      }
-    });
+  user(@Arg("user_id") id: number) {
+    return findUserById(id, options)
   }
 }
 

@@ -4,7 +4,7 @@ import { Channel } from "../entity/Channel";
 
 @Resolver()
 class ChannelResolver {
-  @Mutation(() => Team)
+  @Mutation(() => Channel)
   async createChannel(
     @Arg("name") name: string,
     @Arg("teamId", () => Int) teamId: number,
