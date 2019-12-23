@@ -2,7 +2,6 @@ import { User } from "../User";
 import { findUserByEmail } from "../queries/user";
 
 const findOrCreateUser = async (userData: {
-  user_name: string;
   email: string;
   password: string;
 }): Promise<User | undefined> => {

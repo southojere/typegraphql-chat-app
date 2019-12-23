@@ -14,10 +14,10 @@ export class User extends BaseEntity{
   id: string;
   
   
-  @Field(() => String)
-  @Index({ unique: true })
-  @Column()
-  user_name: string;
+//   @Field(() => String)
+//   @Index({ unique: true })
+//   @Column()
+//   user_name: string;
 
   @Field()
   @Column()

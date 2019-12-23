@@ -10,7 +10,8 @@ const ErrorContainer = styled.div`
 
 const ErrorMessage = ({msg, ...props}) => {
 
-    return <ErrorContainer>{msg}</ErrorContainer>
+    const cleanedMessage = msg.replace("GraphQL error:", "");
+    return <ErrorContainer>{cleanedMessage}</ErrorContainer>
 }
 
 export default ErrorMessage

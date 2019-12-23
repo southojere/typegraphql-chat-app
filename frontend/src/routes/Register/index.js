@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 import ErrorMessage from "../../components/ErrorMessage";
 import { RegisterForm } from "./styles";
@@ -16,16 +18,15 @@ const CREATE_USER_MUTATION = gql`
 `;
 
 const Register = props => {
-  const [createUser, { data }] = useMutation(CREATE_USER_MUTATION);
+  const [createUser, { data, error }] = useMutation(CREATE_USER_MUTATION);
 
+
+  const graphqlError = error && error.message;
   return (
     <Formik
-      initialValues={{ username: "", password: "", email: "" }}
+      initialValues={{ password: "", email: "" }}
       validationSchema={() =>
         Yup.object().shape({
-          username: Yup.string()
-            .max(20, "Please pick a shorter username")
-            .required("Required"),
           email: Yup.string()
             .email("Invalid email")
             .required("Required"),
@@ -34,45 +35,50 @@ const Register = props => {
             .min(8, "Password is too short - should be 5 chars minimum.")
         })
       }
-      onSubmit={(values, actions) => {
-        createUser({
+       onSubmit={async values => {
+        try {
+          await createUser({
             variables: {
-                options: values
+              options: values,
             }
-        })
+          });
+        } catch (e) {
+            console.log(e)
+        }
       }}
     >
       {({ values, errors, handleChange, handleSubmit }) => (
         <RegisterForm onSubmit={handleSubmit}>
           <h1>Sign up</h1>
-          <label for="username">Username</label>
-          <input
-            name="username"
-            type="text"
-            placeholder="enter username"
-            value={values.username}
-            onChange={handleChange}
-          ></input>
-          {errors.username && <ErrorMessage msg={errors.username} />}
-          <label for="email">Email</label>
-          <input
+          <TextField
+            required
+            id="outlined-required"
+            label="Email"
             name="email"
-            type="text"
+            variant="outlined"
             placeholder="enter email"
             value={values.email}
             onChange={handleChange}
-          ></input>
-          {errors.email && <ErrorMessage msg={errors.email} />}
-          <label for="password">Password</label>
-          <input
+            error={!!errors.email}
+            helperText={errors.email}
+          />
+          <TextField
+            required
+            id="outlined-required"
+            label="Password"
             name="password"
-            type="text"
+            variant="outlined"
             placeholder="enter password"
             value={values.password}
             onChange={handleChange}
-          ></input>
-          {errors.password && <ErrorMessage msg={errors.password} />}
-          <button type="submit">Submit</button>
+            error={!!errors.password}
+            helperText={errors.password}
+          />
+          <Button variant="contained" color="primary" type="submit">
+            Sign up
+          </Button>
+          {graphqlError && <ErrorMessage msg={graphqlError}/>}
+          {data && <p>Great! Your all signed up.</p>}
         </RegisterForm>
       )}
     </Formik>

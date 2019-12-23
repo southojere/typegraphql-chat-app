@@ -7,8 +7,6 @@ import { findUserByEmail, findUserById } from "../entity/queries/user";
 @InputType()
 class UserInput {
   @Field()
-  username: string;
-  @Field()
   email: string;
   @Field()
   password: string;
@@ -27,7 +25,6 @@ class UserResolver {
         throw new Error(`User already exists with this email (${options.email})`)
     }
     return findOrCreateUser({
-      user_name: options.username,
       password: hashPassword,
       email: options.email
     });
