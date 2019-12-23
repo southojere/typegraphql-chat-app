@@ -1,7 +1,7 @@
 import React from "react";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
-import Users from './components/Users'
+import Routes from './routes'
 
 const client = new ApolloClient({
   uri: "http://localhost:4000/graphql"
@@ -11,8 +11,7 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      {/* <Routes /> */}
-      <Users/>
+      <Routes />
     </ApolloProvider>
   );
 }

@@ -21,7 +21,7 @@ class UserResolver {
   // MUTATIONS
   @Mutation(() => User)
   async createUser(@Arg("options", () => UserInput) options: UserInput) {
-    const hashPassword = await bcrypt.hash(options.password, 10);
+    const hashPassword = await bcrypt.hash(options.password, 12);
     const existingUser = await findUserByEmail(options.email)
     if(existingUser) {
         throw new Error(`User already exists with this email (${options.email})`)
