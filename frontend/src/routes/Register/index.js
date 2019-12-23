@@ -22,6 +22,11 @@ const Register = props => {
 
 
   const graphqlError = error && error.message;
+
+  if(data && data.createUser) {
+      props.history.push('/')
+  }
+  
   return (
     <Formik
       initialValues={{ password: "", email: "" }}
@@ -78,7 +83,7 @@ const Register = props => {
             Sign up
           </Button>
           {graphqlError && <ErrorMessage msg={graphqlError}/>}
-          {data && <p>Great! Your all signed up.</p>}
+          
         </RegisterForm>
       )}
     </Formik>
