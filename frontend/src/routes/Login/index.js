@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -9,24 +9,28 @@ import Button from "@material-ui/core/Button";
 import ErrorMessage from "../../components/ErrorMessage";
 import { RegisterForm } from "./styles";
 
-const CREATE_USER_MUTATION = gql`
-  mutation($options: UserInput!) {
-    createUser(options: $options) {
+const LOGIN_MUTATION = gql`
+  mutation($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
       id
       email
+      newToken
+      newRefreshToken
     }
   }
 `;
 
-const Register = props => {
-  const [createUser, { data, error }] = useMutation(CREATE_USER_MUTATION);
+const Login = props => {
+  const [loginUser, { data, error }] = useMutation(LOGIN_MUTATION);
 
   const graphqlError = error && error.message;
 
-  if (data && data.createUser) {
+  if (data && data.login) {
+    console.log("Login complete");
     props.history.push("/");
-    console.log("...finished registering");
-    localStorage.setItem("user", JSON.stringify(data.createUser));
+    const { newRefreshToken, newToken } = data.login;
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("refreshToken", newRefreshToken);
   }
 
   return (
@@ -37,17 +41,15 @@ const Register = props => {
           email: Yup.string()
             .email("Invalid email")
             .required("Required"),
-          password: Yup.string()
-            .required("No password provided.")
-            .min(8, "Password is too short - should be 5 chars minimum.")
+          password: Yup.string().required("No password provided.")
         })
       }
       onSubmit={async values => {
-        console.log("...registering user");
         try {
-          await createUser({
+          await loginUser({
             variables: {
-              options: values
+              email: values.email,
+              password: values.password
             }
           });
         } catch (e) {
@@ -57,7 +59,7 @@ const Register = props => {
     >
       {({ values, errors, handleChange, handleSubmit }) => (
         <RegisterForm onSubmit={handleSubmit}>
-          <h1>Sign up</h1>
+          <h1>Login</h1>
           <TextField
             required
             id="outlined-required"
@@ -92,4 +94,4 @@ const Register = props => {
   );
 };
 
-export default Register;
+export default Login;

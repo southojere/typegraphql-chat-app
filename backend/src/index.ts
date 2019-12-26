@@ -11,11 +11,16 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 (async () => {
+  //TODO: add to env file
+  const SECRET = "dsdfksjjeorj3ij43iohnsa";
+  const SECRET2 = "thisisanothersecrettokening112sldaj@@#(*@#@(JHSAD";
   dotenv.config();
   const app = express();
-  app.use(cors({
-      origin: '*'
-  }));
+  app.use(
+    cors({
+      origin: "*"
+    })
+  );
 
   await createConnection({
     type: "postgres",
@@ -49,7 +54,11 @@ import cors from "cors";
         req,
         user: {
           id: 1
-        }
+        },
+        SECRETS: {
+            one: SECRET,
+            two: SECRET2,
+        },
         // user: req.user, // `req.user` comes from `express-jwt`
       };
       return context;

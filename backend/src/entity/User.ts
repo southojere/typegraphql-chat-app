@@ -46,5 +46,9 @@ export class User extends BaseEntity{
   @OneToMany(() => Team, team => team.owner)
   ownedTeams: Team [];
 
+  @Field()
+  newToken: string
+  @Field()
+  newRefreshToken: string
 
 }
