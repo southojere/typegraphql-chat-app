@@ -6,9 +6,5 @@ export default {
     query: {
       limit: 20,
     },
-    stripe: {
-      apiKey:
-        process.env.REACT_APP_STRIPE_KEY || 'pk_test_9YRr1T36PUthpSWPf2MLljmk',
-    },
   };
   
