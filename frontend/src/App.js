@@ -1,12 +1,29 @@
 import React from "react";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
-import Routes from './routes'
+import Routes from "./routes";
+import config from "./config";
+
+const uri = config.api;
 
 const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql"
+  uri,
+  request: operation => {
+    const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
+    operation.setContext({
+      headers: {
+        "x-authorization": token ? token : "",
+        "x-refresh-token": refreshToken ? refreshToken : ""
+      }
+    });
+  },
+  onError: ({ graphQLErrors, networkError }) => {
+    if (networkError) {
+      // logoutUser();
+    }
+  }
 });
-
 
 function App() {
   return (

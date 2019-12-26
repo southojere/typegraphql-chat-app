@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { Field, ObjectType } from "type-graphql";
 import { Message } from "./Message";
 import { Team } from "./Team";
+import { IsEmail } from "class-validator";
 
 
 
@@ -26,6 +27,7 @@ export class User extends BaseEntity{
   
   @Field()
   @Index({ unique: true })
+  @IsEmail()
   @Column()
   email: string;
 

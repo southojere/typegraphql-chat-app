@@ -1,6 +1,7 @@
 import { Resolver, Mutation, Arg, Query, Ctx } from "type-graphql";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
+// import { findUserById } from "../entity/queries/user";
 
 const options = { relations: ["owner", "channels"] };
 
@@ -20,9 +21,12 @@ class TeamResolver {
   }
 
   @Query(() => [Team])
-  teams() {
+  async teams(@Ctx("user") user: User) {
     return Team.find({
-      ...options
+      ...options,
+      where: {
+        owner: user ? user.id : undefined 
+      }
     });
   }
 

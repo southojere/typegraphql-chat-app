@@ -9,6 +9,7 @@ import { TeamResolver } from "./resolvers/team";
 import { ChannelResolver } from "./resolvers/channel";
 import dotenv from "dotenv";
 import cors from "cors";
+import jwt from "jsonwebtoken";
 
 (async () => {
   //TODO: add to env file
@@ -21,6 +22,29 @@ import cors from "cors";
       origin: "*"
     })
   );
+
+
+  const addUser = async (req: any, res: any, next: any) => {
+    const token = req.headers["x-authorization"];
+    if (token) {
+      try {
+        const { user }: any = jwt.verify(token, SECRET);
+        req.user = user;
+      } catch (err) {
+        // try refresh tokens - TODO: see how to do afterware with apollo boost
+        // const refreshToken = req.headers['x-refresh-token'];
+        // const newTokens = await refreshTokens(refreshToken, SECRET, SECRET2);
+        // if (newTokens.token && newTokens.refreshToken) {
+        //   res.set('Access-Control-Expose-Headers', 'x-token, x-refresh-token');
+        //   res.set('x-token', newTokens.token);
+        //   res.set('x-refresh-token', newTokens.refreshToken);
+        // }
+        // req.user = newTokens.user;
+      }
+    }
+    next();
+  };
+  app.use(addUser);
 
   await createConnection({
     type: "postgres",
@@ -49,16 +73,14 @@ import cors from "cors";
       resolvers: [TeamResolver, UserResolver, MessageResolver, ChannelResolver],
       validate: true
     }),
-    context: ({ req }) => {
+    context: ({ req }: any) => {
       const context = {
         req,
-        user: {
-          id: 1
-        },
+        user: req.user,
         SECRETS: {
-            one: SECRET,
-            two: SECRET2,
-        },
+          one: SECRET,
+          two: SECRET2
+        }
         // user: req.user, // `req.user` comes from `express-jwt`
       };
       return context;

@@ -1,7 +1,7 @@
 import { User } from "../User";
 
 const findUserById = (
-  id: number,
+  id: string | number,
   options: any = {}
 ): Promise<User | undefined> => {
   return User.findOne({
