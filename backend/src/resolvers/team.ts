@@ -22,6 +22,7 @@ class TeamResolver {
 
   @Query(() => [Team])
   async teams(@Ctx("user") user: User) {
+      if(!user) throw new Error('No user found')
     return Team.find({
       ...options,
       where: {

@@ -3,11 +3,10 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
 
 import ErrorMessage from "../../components/ErrorMessage";
-import { RegisterForm } from "./styles";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 const LOGIN_MUTATION = gql`
   mutation($email: String!, $password: String!) {
@@ -44,7 +43,7 @@ const Login = props => {
           password: Yup.string().required("No password provided.")
         })
       }
-      onSubmit={async values => {
+      onSubmit={async (values) => {
         try {
           await loginUser({
             variables: {
@@ -57,38 +56,48 @@ const Login = props => {
         }
       }}
     >
-      {({ values, errors, handleChange, handleSubmit }) => (
-        <RegisterForm onSubmit={handleSubmit}>
-          <h1>Login</h1>
-          <TextField
-            required
-            id="outlined-required"
-            label="Email"
-            name="email"
-            variant="outlined"
-            placeholder="enter email"
-            value={values.email}
-            onChange={handleChange}
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-          <TextField
-            required
-            id="outlined-required"
-            label="Password"
-            name="password"
-            variant="outlined"
-            placeholder="enter password"
-            value={values.password}
-            onChange={handleChange}
-            error={!!errors.password}
-            helperText={errors.password}
-          />
-          <Button variant="contained" color="primary" type="submit">
-            Sign up
+      {({
+        values,
+        handleChange,
+        handleSubmit,
+        touched,
+        handleBlur,
+        errors,
+      }) => (
+        <Form onSubmit={handleSubmit}>
+          {console.log(errors)}
+          <Form.Group controlId="formBasicEmail">
+            <Form.Label>Email address</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              placeholder="Enter email"
+              onChange={handleChange}
+              isValid={touched.email && !errors.email}
+              value={values.email}
+              onBlur={handleBlur}
+            />
+            {touched.email && <ErrorMessage msg={errors.email}/>}
+          </Form.Group>
+
+          <Form.Group controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              name="password"
+              onChange={handleChange}
+              value={values.password}
+              onBlur={handleBlur}
+              isValid={touched.password && !errors.password}
+            />
+            {touched.password && <ErrorMessage msg={errors.password}/>}
+          </Form.Group>
+          <Button variant="primary" type="submit">
+            Login
           </Button>
           {graphqlError && <ErrorMessage msg={graphqlError} />}
-        </RegisterForm>
+        </Form>
       )}
     </Formik>
   );

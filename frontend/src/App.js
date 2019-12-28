@@ -1,8 +1,11 @@
 import React from "react";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
+
+
 import Routes from "./routes";
 import config from "./config";
+import GlobalStyles from "./styles/global";
 
 const uri = config.api;
 
@@ -29,6 +32,7 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Routes />
+      <GlobalStyles />
     </ApolloProvider>
   );
 }
