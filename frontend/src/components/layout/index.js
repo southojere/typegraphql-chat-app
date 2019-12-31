@@ -18,7 +18,7 @@ const Layout = props => {
               localStorage.removeItem('token')
           }}>Logout</Nav.Link>
         ) : (
-          <Nav.Link href="/teams">Sign in</Nav.Link>
+          <Nav.Link href="/login">Sign in</Nav.Link>
         )}
       </Navbar>
       <div
