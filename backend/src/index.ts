@@ -7,9 +7,11 @@ import { UserResolver } from "./resolvers/user";
 import { MessageResolver } from "./resolvers/message";
 import { TeamResolver } from "./resolvers/team";
 import { ChannelResolver } from "./resolvers/channel";
+import { NoteResolver } from "./resolvers/note";
 import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import { findUserById } from "./entity/queries/user";
 
 (async () => {
   //TODO: add to env file
@@ -23,13 +25,13 @@ import jwt from "jsonwebtoken";
     })
   );
 
-
   const addUser = async (req: any, res: any, next: any) => {
     const token = req.headers["x-authorization"];
     if (token) {
       try {
         const { user }: any = jwt.verify(token, SECRET);
-        req.user = user;
+        const userModel = await findUserById(user.id);
+        req.user = userModel;
       } catch (err) {
         // try refresh tokens - TODO: see how to do afterware with apollo boost
         // const refreshToken = req.headers['x-refresh-token'];
@@ -46,13 +48,15 @@ import jwt from "jsonwebtoken";
   };
   app.use(addUser);
 
+  console.log(process.env.TYPEORM_DATABASE);
   await createConnection({
     type: "postgres",
-    host: process.env.TYPEORM_HOST,
+    host: "ec2-107-20-155-148.compute-1.amazonaws.com",
     port: 5432,
-    username: process.env.TYPEORM_USERNAME,
-    password: process.env.TYPEORM_PASSWORD,
-    database: process.env.TYPEORM_DATABASE,
+    username: "rmztuldfzbzczy",
+    password:
+      "a681505eeabdcff289eaea5b1ef854a2deb5830ba39f6a09c74dda022f4dab12",
+    database: "dfv0gcuri0dlli",
     extra: {
       ssl: true
     },
@@ -66,14 +70,17 @@ import jwt from "jsonwebtoken";
       migrationsDir: "src/migration",
       subscribersDir: "src/subscriber"
     }
-  }).catch(e => console.log(e));
+  }).catch(e => console.log(`[creating connection error] `, e));
 
   const apolloServer = new ApolloServer({
+    playground: true,
     schema: await buildSchema({
-      resolvers: [TeamResolver, UserResolver, MessageResolver, ChannelResolver],
+      resolvers: [TeamResolver, UserResolver, MessageResolver, ChannelResolver,NoteResolver],
       validate: true
     }),
     context: ({ req }: any) => {
+      const token = req.headers["x-authorization"];
+      console.log(token);
       const context = {
         req,
         user: req.user,
@@ -88,7 +95,7 @@ import jwt from "jsonwebtoken";
   });
 
   apolloServer.applyMiddleware({ app, cors: false });
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 4009;
   app.listen(port, () => {
     console.log(`server started at http://localhost:${port}/graphql`);
   });

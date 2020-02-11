@@ -10,6 +10,8 @@ class TeamResolver {
   @Mutation(() => Team)
   //   @Authorized()
   async createTeam(@Arg("name") name: string, @Ctx("user") user: User) {
+      console.log('createTeam')
+      console.log(user)
     return Team.create({
       name: name,
       owner: await User.findOne({

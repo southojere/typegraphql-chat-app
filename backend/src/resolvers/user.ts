@@ -21,7 +21,7 @@ class UserInput {
 }
 
 
-const options = { relations: ["ownedTeams"] };
+const options = { relations: ["ownedTeams", "notes"] };
 
 @Resolver()
 class UserResolver {
@@ -48,15 +48,12 @@ class UserResolver {
         two: string,
     }
   ) {
-    console.log(SECRETS);
-    console.log(email,password)
     const user: any = await authenticate(
       email,
       password,
       SECRETS.one,
       SECRETS.two
     );
-    console.log(user)
     // if (!user) throw new Error("Could not authenticate the user");
 
     // console.log(user);

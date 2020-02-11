@@ -3,6 +3,7 @@ import { Field, ObjectType } from "type-graphql";
 import { Message } from "./Message";
 import { Team } from "./Team";
 import { IsEmail } from "class-validator";
+import { Note } from "./Note";
 
 
 
@@ -47,6 +48,10 @@ export class User extends BaseEntity{
   @Field(() => [Team])
   @OneToMany(() => Team, team => team.owner)
   ownedTeams: Team [];
+
+  @Field(() =>  [Note])
+  @OneToMany(() => Note, note => note.user)
+  notes: Note[];
 
   @Field()
   newToken: string
