@@ -26,9 +26,14 @@ const client = new ApolloClient({
 });
 
 function App() {
+  const [errors, setErrors] = React.useState(null);
   return (
     <ApolloProvider client={client}>
-      <Login/>
+      <div className="App absolute w-full h-full flex justify-center items-center">
+        <div className="w-full max-w-md bg-grey-800">
+          <Login />
+        </div>
+      </div>
     </ApolloProvider>
   );
 }

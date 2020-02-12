@@ -3,6 +3,12 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
+import styled from "@emotion/styled";
+
+import Alert from "../Alert";
+
+const Button = styled.button`
+`;
 
 const LOGIN_MUTATION = gql`
   mutation($email: String!, $password: String!) {
@@ -60,53 +66,51 @@ const Login = props => {
         handleBlur,
         errors
       }) => (
-          
-        <div>
-            {console.log(errors)}
-          <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <div className="App absolute w-full h-full flex justify-center items-center">
-              <div className="w-full max-w-md bg-grey-800">
-                <form
-                  onSubmit={handleSubmit}
-                  action=""
-                  className="bg-white shadow-md rounded px-8 py-8 pt-8"
-                >
-                  <div className="px-4 pb-4">
-                    <label
-                      htmlFor="email"
-                      className="text-sm block font-bold pb-2"
-                    >
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      onChange={handleChange}
-                      placeholder="john@doe.com"
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline"
-                    ></input>
-                  </div>
-                  <div className="px-4 pb-4">
-                    <label
-                      htmlFor="password"
-                      className="text-sm block font-bold pb-2"
-                    >
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      name="password"
-                      onChange={handleChange}
-                      placeholder="Enter your password"
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline"
-                    ></input>
-                  </div>
-                  <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 mx-4 rounded">Login</button>
-                </form>
-              </div>
+        <>
+          {Object.keys(errors).length > 0 && <Alert />}
+          <form
+            onSubmit={handleSubmit}
+            action=""
+            className="bg-white shadow-md rounded px-8 py-8 pt-8"
+          >
+            <div className="px-4 pb-4">
+              <label htmlFor="email" className="text-sm block font-bold pb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                onChange={handleChange}
+                placeholder="john@doe.com"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline"
+              ></input>
             </div>
+            <div className="px-4 pb-4">
+              <label
+                htmlFor="password"
+                className="text-sm block font-bold pb-2"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className={
+                  "shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline" +
+                  (errors.password ? " border border-red-500" : "")
+                }
+              ></input>
+            </div>
+            <Button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 mx-4 rounded"
+            >
+              Login
+            </Button>
           </form>
-        </div>
+        </>
       )}
     </Formik>
   );
