@@ -3,12 +3,15 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-import styled from "@emotion/styled";
+
+import styled from 'styled-components'
+import tw from 'tailwind.macro'
 
 import Alert from "../Alert";
 
-const Button = styled.button`
-`;
+const Heading = styled.h1`
+  ${tw`font-bold text-4xl text-blue font-sans`}
+`
 
 const LOGIN_MUTATION = gql`
   mutation($email: String!, $password: String!) {
@@ -73,6 +76,7 @@ const Login = props => {
             action=""
             className="bg-white shadow-md rounded px-8 py-8 pt-8"
           >
+              <Heading>testng</Heading>
             <div className="px-4 pb-4">
               <label htmlFor="email" className="text-sm block font-bold pb-2">
                 Email Address
@@ -103,12 +107,12 @@ const Login = props => {
                 }
               ></input>
             </div>
-            <Button
+            <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 mx-4 rounded"
             >
               Login
-            </Button>
+            </button>
           </form>
         </>
       )}
