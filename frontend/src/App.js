@@ -2,7 +2,10 @@ import React from "react";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import config from "./config";
-import Login from "./components/Login";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Notes from "./pages/Notes";
+import Error from "./pages/404";
+import LoginPage from "./pages/Login";
 
 const uri = config.api;
 
@@ -26,14 +29,15 @@ const client = new ApolloClient({
 });
 
 function App() {
-  const [errors, setErrors] = React.useState(null);
   return (
     <ApolloProvider client={client}>
-      <div className="App absolute w-full h-full flex justify-center items-center">
-        <div className="w-full max-w-md bg-grey-800">
-          <Login />
-        </div>
-      </div>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/" component={LoginPage} exact />
+          <Route path="/notes" component={Notes} exact />
+          <Route component={Error} />
+        </Switch>
+      </BrowserRouter>
     </ApolloProvider>
   );
 }

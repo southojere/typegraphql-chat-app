@@ -3,15 +3,33 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-
-import styled from 'styled-components'
-import tw from 'tailwind.macro'
+import styled from "styled-components";
 
 import Alert from "../Alert";
+import { Input, Icon, Form, Button } from "antd";
 
-const Heading = styled.h1`
-  ${tw`font-bold text-4xl text-blue font-sans`}
-`
+const Header = styled.p`
+  font-size: 20px;
+  margin-bottom: 0.5rem;
+`;
+
+const FormWrapper = styled(Form)`
+  padding: 0 3rem;
+`;
+
+const FormItem = styled(Form.Item)`
+  margin: 0;
+`;
+
+const SubmitButton = styled(Button)`
+  background: #ec4079;
+  border: 0;
+
+  &:hover {
+      background-color: #ec4079;
+      opacity:.8;
+  }
+`;
 
 const LOGIN_MUTATION = gql`
   mutation($email: String!, $password: String!) {
@@ -26,7 +44,7 @@ const LOGIN_MUTATION = gql`
 
 const Login = props => {
   const [loginUser, { data, error }] = useMutation(LOGIN_MUTATION);
-
+  const [loading, setLoading] = React.useState(false);
   const graphqlError = error && error.message;
 
   if (data && data.login) {
@@ -36,6 +54,22 @@ const Login = props => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("refreshToken", newRefreshToken);
   }
+
+  const handleLogin = async values => {
+    setLoading(true);
+    try {
+      await loginUser({
+        variables: {
+          email: values.email,
+          password: values.password
+        }
+      });
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
+    setLoading(false);
+  };
 
   return (
     <Formik
@@ -48,18 +82,7 @@ const Login = props => {
           password: Yup.string().required("No password provided.")
         })
       }
-      onSubmit={async values => {
-        try {
-          await loginUser({
-            variables: {
-              email: values.email,
-              password: values.password
-            }
-          });
-        } catch (e) {
-          console.log(e);
-        }
-      }}
+      onSubmit={handleLogin}
     >
       {({
         values,
@@ -70,50 +93,51 @@ const Login = props => {
         errors
       }) => (
         <>
-          {Object.keys(errors).length > 0 && <Alert />}
-          <form
-            onSubmit={handleSubmit}
-            action=""
-            className="bg-white shadow-md rounded px-8 py-8 pt-8"
-          >
-              <Heading>testng</Heading>
+         <FormWrapper onSubmit={handleSubmit} action="">
             <div className="px-4 pb-4">
-              <label htmlFor="email" className="text-sm block font-bold pb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                onChange={handleChange}
-                placeholder="john@doe.com"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline"
-              ></input>
-            </div>
-            <div className="px-4 pb-4">
-              <label
-                htmlFor="password"
-                className="text-sm block font-bold pb-2"
+              <Header>SIGN IN</Header>
+              <FormItem
+                hasFeedback
+                extra={errors.email}
+                validateStatus={!!errors.email ? "error" : ""}
               >
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className={
-                  "shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight focus:outline-none focus:shadow-outline" +
-                  (errors.password ? " border border-red-500" : "")
-                }
-              ></input>
+                <Input
+                  type="email"
+                  name="email"
+                  onChange={handleChange}
+                  placeholder="Email"
+                  size="large"
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                />
+              </FormItem>
             </div>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 mx-4 rounded"
-            >
-              Login
-            </button>
-          </form>
+            <div className="px-4 pb-4">
+              <FormItem
+                hasFeedback
+                extra={errors.password}
+                validateStatus={!!errors.password ? "error" : ""}
+              >
+                <Input
+                  type="password"
+                  name="password"
+                  onChange={handleChange}
+                  placeholder="Password"
+                  size="large"
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                />
+              </FormItem>
+            </div>
+
+            <div className="px-4 pb-4">
+              <SubmitButton block loading={loading} htmlType="submit" type="primary">
+                Login
+              </SubmitButton>
+            </div>
+          </FormWrapper>
         </>
       )}
     </Formik>
