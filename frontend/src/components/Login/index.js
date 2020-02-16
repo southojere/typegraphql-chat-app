@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import styled from "styled-components";
+import { useHistory } from "react-router-dom";
 
 import Alert from "../Alert";
 import { Input, Icon, Form, Button } from "antd";
@@ -29,6 +30,10 @@ const SubmitButton = styled(Button)`
       background-color: #ec4079;
       opacity:.8;
   }
+  &:focus {
+      background-color: #ec4079;
+      opacity:.8;
+  }
 `;
 
 const LOGIN_MUTATION = gql`
@@ -43,13 +48,14 @@ const LOGIN_MUTATION = gql`
 `;
 
 const Login = props => {
+    const history = useHistory();
   const [loginUser, { data, error }] = useMutation(LOGIN_MUTATION);
   const [loading, setLoading] = React.useState(false);
   const graphqlError = error && error.message;
 
   if (data && data.login) {
     console.log("Login complete");
-    props.history.push("/");
+    history.push("/notes");
     const { newRefreshToken, newToken } = data.login;
     localStorage.setItem("token", newToken);
     localStorage.setItem("refreshToken", newRefreshToken);
@@ -126,7 +132,7 @@ const Login = props => {
                   placeholder="Password"
                   size="large"
                   prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
                   }
                 />
               </FormItem>
