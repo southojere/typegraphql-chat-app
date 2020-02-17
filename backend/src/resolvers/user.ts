@@ -5,7 +5,7 @@ import {
   Query,
   InputType,
   Field,
-  Ctx,
+  Ctx
 } from "type-graphql";
 import bcrypt from "bcrypt";
 import { User } from "../entity/User";
@@ -19,7 +19,6 @@ class UserInput {
   @Field()
   password: string;
 }
-
 
 const options = { relations: ["ownedTeams", "notes"] };
 
@@ -43,9 +42,10 @@ class UserResolver {
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string,
-    @Ctx("SECRETS") SECRETS: {
-        one: string,
-        two: string,
+    @Ctx("SECRETS")
+    SECRETS: {
+      one: string;
+      two: string;
     }
   ) {
     const user: any = await authenticate(
@@ -61,6 +61,11 @@ class UserResolver {
   }
 
   // QUERYS
+  @Query(() => User)
+  me(@Ctx("user") user: User) {
+    return findUserById(user.id, options);;
+  }
+  
   @Query(() => [User])
   users() {
     return User.find({ ...options });
