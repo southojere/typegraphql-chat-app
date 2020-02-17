@@ -5,9 +5,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-
-import Alert from "../Alert";
-import { Input, Icon, Form, Button } from "antd";
+import { Input, Icon, Form, Button, Alert } from "antd";
 
 const Header = styled.p`
   font-size: 20px;
@@ -22,19 +20,23 @@ const FormItem = styled(Form.Item)`
   margin: 0;
 `;
 
-const SubmitButton = styled(Button)`
-  background: #ec4079;
-  border: 0;
+const SubmitButton = styled(Button)``;
 
-  &:hover {
-      background-color: #ec4079;
-      opacity:.8;
-  }
-  &:focus {
-      background-color: #ec4079;
-      opacity:.8;
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  span {
+    margin: 0.5rem 0;
+    font-size: 12px;
+    text-align: center;
   }
 `;
+
+const FORM_STATES = {
+  LOGIN: 0,
+  SIGNUP: 1
+};
 
 const LOGIN_MUTATION = gql`
   mutation($email: String!, $password: String!) {
@@ -47,18 +49,39 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-const Login = props => {
-    const history = useHistory();
-  const [loginUser, { data, error }] = useMutation(LOGIN_MUTATION);
-  const [loading, setLoading] = React.useState(false);
-  const graphqlError = error && error.message;
+const SIGNUP_MUTATION = gql`
+  mutation($options: UserInput!) {
+    createUser(options: $options) {
+      id
+      email
+    }
+  }
+`;
 
-  if (data && data.login) {
-    console.log("Login complete");
+const Login = props => {
+  const history = useHistory();
+  const [loginUser, { data: loginData, error: loginError }] = useMutation(
+    LOGIN_MUTATION
+  );
+  const [
+    createUser,
+    { data: registerData, error: registerError }
+  ] = useMutation(SIGNUP_MUTATION);
+  const [formState, setFormState] = React.useState(FORM_STATES.LOGIN);
+  const [loading, setLoading] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+
+  const graphqlError =
+    (loginError && loginError.message) ||
+    (registerError && registerError.message);
+
+  if (loginData && loginData.login) {
     history.push("/notes");
-    const { newRefreshToken, newToken } = data.login;
+    const { newRefreshToken, newToken } = loginData.login;
     localStorage.setItem("token", newToken);
     localStorage.setItem("refreshToken", newRefreshToken);
+  } else if (registerData && registerData.createUser) {
+    // TODO: handle successful signup
   }
 
   const handleLogin = async values => {
@@ -77,6 +100,75 @@ const Login = props => {
     setLoading(false);
   };
 
+  const handleSignUp = async (values, resetForm) => {
+    setLoading(true);
+    try {
+      await createUser({
+        variables: {
+          options: {
+            email: values.email,
+            password: values.password
+          }
+        }
+      }).then(() => {
+        setMessage("Done! Try logging in :)");
+        resetForm({});
+      });
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
+    setLoading(false);
+  };
+
+  const RenderButtons = () => {
+    if (formState === FORM_STATES.LOGIN) {
+      return (
+        <ButtonWrapper className="px-4">
+          <SubmitButton
+            block
+            loading={loading}
+            htmlType="submit"
+            type="primary"
+            onClick={() => setFormState(FORM_STATES.LOGIN)}
+          >
+            Login
+          </SubmitButton>
+          <span style={{ textDecoration: "underline" }}>Or</span>
+          <SubmitButton
+            block
+            htmlType="submit"
+            onClick={() => setFormState(FORM_STATES.SIGNUP)}
+          >
+            Create account
+          </SubmitButton>
+        </ButtonWrapper>
+      );
+    } else if (formState === FORM_STATES.SIGNUP) {
+      return (
+        <ButtonWrapper className="px-4">
+          <SubmitButton
+            block
+            loading={loading}
+            htmlType="submit"
+            type="primary"
+            onClick={() => setFormState(FORM_STATES.SIGNUP)}
+          >
+            Create account
+          </SubmitButton>
+          <span>Or</span>
+          <SubmitButton
+            block
+            htmlType="submit"
+            onClick={() => setFormState(FORM_STATES.LOGIN)}
+          >
+            Login
+          </SubmitButton>
+        </ButtonWrapper>
+      );
+    }
+  };
+
   return (
     <Formik
       initialValues={{ password: "", email: "" }}
@@ -88,7 +180,14 @@ const Login = props => {
           password: Yup.string().required("No password provided.")
         })
       }
-      onSubmit={handleLogin}
+      onSubmit={(values, { resetForm }) => {
+        console.log("submiting");
+        if (formState === FORM_STATES.SIGNUP) {
+          handleSignUp(values, resetForm);
+        } else if (formState === FORM_STATES.LOGIN) {
+          handleLogin(values);
+        }
+      }}
     >
       {({
         values,
@@ -99,9 +198,11 @@ const Login = props => {
         errors
       }) => (
         <>
-         <FormWrapper onSubmit={handleSubmit} action="">
+          <FormWrapper onSubmit={handleSubmit} action="">
             <div className="px-4 pb-4">
-              <Header>SIGN IN</Header>
+              <Header>
+                {formState === FORM_STATES.LOGIN ? "SIGN IN" : "SIGN UP"}
+              </Header>
               <FormItem
                 hasFeedback
                 extra={errors.email}
@@ -110,6 +211,7 @@ const Login = props => {
                 <Input
                   type="email"
                   name="email"
+                  value={values.email}
                   onChange={handleChange}
                   placeholder="Email"
                   size="large"
@@ -128,6 +230,7 @@ const Login = props => {
                 <Input
                   type="password"
                   name="password"
+                  value={values.password}
                   onChange={handleChange}
                   placeholder="Password"
                   size="large"
@@ -137,12 +240,26 @@ const Login = props => {
                 />
               </FormItem>
             </div>
-
-            <div className="px-4 pb-4">
-              <SubmitButton block loading={loading} htmlType="submit" type="primary">
-                Login
-              </SubmitButton>
-            </div>
+            {graphqlError && (
+              <div className="px-4 pb-4">
+                <Alert
+                  type="error"
+                  message="[GraphQL] Whoops an error occurred"
+                />
+              </div>
+            )}
+            {message && (
+              <div className="px-4 pb-4">
+                <Alert
+                  showIcon
+                  type="success"
+                  message={message}
+                  closable
+                  onClose={() => setMessage("")}
+                />
+              </div>
+            )}
+            <RenderButtons />
           </FormWrapper>
         </>
       )}

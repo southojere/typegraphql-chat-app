@@ -39,11 +39,10 @@ const LeftHalf = styled.div`
 `;
 
 const RightHalf = styled.div`
-display: flex;
-    flex-direction: column;
-    justify-content: center;
-`
-
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
 
 const LoginPage = () => {
   return (
@@ -58,9 +57,7 @@ const LoginPage = () => {
 
       <RightHalf>
         <Login />
-      
       </RightHalf>
-      
     </Container>
   );
 };
