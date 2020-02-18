@@ -6,6 +6,9 @@ import { ObjectType, Field } from "type-graphql";
 @ObjectType()
 @Entity("notes")
 export class Note extends BaseEntity{
+
+  @Field()
+  @Column()
   @PrimaryGeneratedColumn()
   id: number;
 
