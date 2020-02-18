@@ -48,6 +48,22 @@ class NoteResolver {
     return await findNoteById(noteId);
   }
 
+  @Mutation(() => Boolean)
+  async deleteNote(@Ctx("user") user: User, @Arg("noteId") noteId: number) {
+    const noteToRemove = await Note.findOne({
+      where: {
+        id: noteId
+      }
+    });
+    if (!noteToRemove) {
+      throw new Error(`Could not find note (${noteId}) to remove.`);
+    }
+    if (`${noteToRemove.userId}` !== `${user.id}`) {
+      throw new Error("Cannot remove someone elses note");
+    }
+    return !!(await Note.remove(noteToRemove));
+  }
+
   @FieldResolver()
   async user(@Root() note: Note): Promise<User | undefined> {
     return await findUserById(note.userId);
