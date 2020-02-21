@@ -10,6 +10,17 @@ const Container = styled.div`
     width: 50%;
     height: 100vh;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    > div {
+      width: 100% !important;
+      height: unset;
+    }
+    > div:first-child {
+        margin-bottom:3rem;
+    }
+  }
 `;
 
 const LeftHalf = styled.div`
