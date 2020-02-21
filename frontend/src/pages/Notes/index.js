@@ -2,8 +2,9 @@ import React from "react";
 import { gql } from "apollo-boost";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import styled from "styled-components";
-import { Typography, Button, List, Spin } from "antd";
+import { Typography, Button, List, Spin, notification, Icon } from "antd";
 import AddNoteModal from "./components/AddNoteModal";
+import EditNoteModal from "./components/EditNoteModal";
 
 const { Title } = Typography;
 
@@ -13,7 +14,7 @@ const ME = gql`
       id
       email
       notes {
-          id
+        id
         text
       }
     }
@@ -21,8 +22,8 @@ const ME = gql`
 `;
 
 const REMOVE_NOTE = gql`
-  mutation removeNote ($noteId: Float!) {
-    deleteNote(noteId:$noteId)
+  mutation removeNote($noteId: Float!) {
+    deleteNote(noteId: $noteId)
   }
 `;
 
@@ -31,6 +32,7 @@ const Container = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
+  background: #fa5f91;
 `;
 
 const NotePadContainer = styled.div`
@@ -41,12 +43,14 @@ const NotePadContainer = styled.div`
   /* min-width: 400px; */
   margin: auto;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  background: white;
+  border-radius: 5px;
 `;
 
 const ActionWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top:1rem;
+  margin-top: 1rem;
 `;
 
 const ListItem = styled(List.Item)`
@@ -60,10 +64,18 @@ const Notes = () => {
 
   const user = data ? data.me : null;
   const notes = user ? user.notes : [];
+
+  const openNotification = () => {
+    notification.open({
+      message: "Note/Task Removed",
+      icon: <Icon type="smile" style={{ color: "#108ee9" }} />
+    });
+  };
+
   return (
     <Container>
       <NotePadContainer>
-        <Title underline>Notes</Title>
+        {!loading && <Title underline>Notes</Title>}
         {loading ? (
           <Spin />
         ) : (
@@ -73,10 +85,20 @@ const Notes = () => {
             renderItem={note => (
               <ListItem
                 actions={[
-                  <Button shape="circle" icon="edit" />,
-                  <Button shape="circle" icon="delete" type="danger"  onClick={async () => {
-                    await removeNote({variables: {noteId: note.id}}).then(() => refetch());
-                  }}/>
+                  <EditNoteModal refetch={refetch} note={note} />,
+                  <Button
+                    shape="circle"
+                    icon="delete"
+                    type="danger"
+                    onClick={async () => {
+                      await removeNote({
+                        variables: { noteId: note.id }
+                      }).then(() => {
+                        openNotification();
+                        refetch();
+                      });
+                    }}
+                  />
                 ]}
               >
                 {note.text}
@@ -84,10 +106,14 @@ const Notes = () => {
             )}
           ></List>
         )}
-        <br />
-        <ActionWrapper>
-        <AddNoteModal refetch={refetch}/>
-        </ActionWrapper>
+        {!loading && (
+          <>
+            <br />
+            <ActionWrapper>
+              <AddNoteModal refetch={refetch} />
+            </ActionWrapper>
+          </>
+        )}
       </NotePadContainer>
     </Container>
   );

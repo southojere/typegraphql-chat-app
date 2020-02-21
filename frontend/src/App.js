@@ -6,7 +6,6 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Notes from "./pages/Notes";
 import Error from "./pages/404";
 import LoginPage from "./pages/Login";
-
 const uri = config.api;
 
 const client = new ApolloClient({

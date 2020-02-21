@@ -4,21 +4,19 @@ import gql from "graphql-tag";
 import { useMutation } from "@apollo/react-hooks";
 import FormItem from "antd/lib/form/FormItem";
 
-const CREATE_NOTE_MUTATION = gql`
-  mutation($text: String!) {
-    createNote(text: $text) {
-      text
+const EDIT_NOTE = gql`
+  mutation($noteId: Float!, $options: NoteInput!) {
+    updateNote(noteId: $noteId, options: $options) {
+      id
     }
   }
 `;
 
-
-
-const AddNoteModal = ({ refetch }) => {
+const EditNoteModal = ({ note, refetch }) => {
   const [visible, setVisibility] = React.useState(false);
-  const [text, setText] = React.useState(false);
+  const [text, setText] = React.useState(note.text);
   const [loading, setLoading] = React.useState(false);
-  const [addNote, { data }] = useMutation(CREATE_NOTE_MUTATION);
+  const [editNote, { data }] = useMutation(EDIT_NOTE);
 
   const showModal = () => setVisibility(true);
   const hideModal = () => setVisibility(false);
@@ -26,9 +24,12 @@ const AddNoteModal = ({ refetch }) => {
   const handleAdd = async () => {
     if (!text) return;
     setLoading(true);
-    const res = await addNote({
+    await editNote({
       variables: {
-        text
+        noteId: note.id,
+        options: {
+          text
+        }
       }
     }).then(() => {
       refetch();
@@ -45,27 +46,26 @@ const AddNoteModal = ({ refetch }) => {
 
   const openNotification = () => {
     notification.open({
-      message: "Note/Task Added",
+      message: "Note/Task Updated",
       icon: <Icon type="smile" style={{ color: "#108ee9" }} />
     });
   };
 
   return (
     <div>
-      <Button type="primary" icon="plus" onClick={() => showModal()}>
-        Add
-      </Button>
+      <Button shape="circle" icon="edit" onClick={() => showModal()}></Button>
       <Modal
-        title="Create new note"
+        title="Edit Note/Task"
         visible={visible}
         onOk={handleAdd}
         confirmLoading={loading}
         onCancel={handleCancel}
-        okText="Add"
+        okText="Edit"
       >
-        <FormItem label="Task/Note" validateStatus={!text ? 'error' : ''}>
+        <FormItem label="Task/Note" validateStatus={!text ? "error" : ""}>
           <Input
             name="note"
+            value={text}
             placeholder="Do the dishes"
             allowClear
             onChange={e => setText(e.target.value)}
@@ -76,4 +76,4 @@ const AddNoteModal = ({ refetch }) => {
   );
 };
 
-export default AddNoteModal;
+export default EditNoteModal;

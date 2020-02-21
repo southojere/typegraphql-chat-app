@@ -42,9 +42,14 @@ class NoteResolver {
     @Arg("options", () => NoteInput) options: NoteInput
   ) {
     if (!user) throw new Error("No user found");
-    const note = await findNoteById(noteId);
-    if (!note) throw new Error(`No note found with id of ${noteId}`);
-    await Note.update(note, options);
+    const noteToEdit = await findNoteById(noteId);
+    if (!noteToEdit) {
+      throw new Error(`Could not find note (${noteId}) to edit.`);
+    }
+    if (`${noteToEdit.userId}` !== `${user.id}`) {
+      throw new Error("Cannot edit someone elses note");
+    }
+    await Note.update(noteToEdit, options);
     return await findNoteById(noteId);
   }
 
