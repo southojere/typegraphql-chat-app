@@ -48,15 +48,13 @@ import { findUserById } from "./entity/queries/user";
   };
   app.use(addUser);
 
-  console.log(process.env.TYPEORM_DATABASE);
   await createConnection({
     type: "postgres",
-    host: "ec2-107-20-155-148.compute-1.amazonaws.com",
+    host: process.env.TYPEORM_HOST,
     port: 5432,
-    username: "rmztuldfzbzczy",
-    password:
-      "a681505eeabdcff289eaea5b1ef854a2deb5830ba39f6a09c74dda022f4dab12",
-    database: "dfv0gcuri0dlli",
+    username: process.env.TYPEORM_USERNAME,
+    password: process.env.TYPEORM_PASSWORD,
+    database: process.env.TYPEORM_DATABASE,
     extra: {
       ssl: true
     },
@@ -75,7 +73,13 @@ import { findUserById } from "./entity/queries/user";
   const apolloServer = new ApolloServer({
     playground: true,
     schema: await buildSchema({
-      resolvers: [TeamResolver, UserResolver, MessageResolver, ChannelResolver,NoteResolver],
+      resolvers: [
+        TeamResolver,
+        UserResolver,
+        MessageResolver,
+        ChannelResolver,
+        NoteResolver
+      ],
       validate: true
     }),
     context: ({ req }: any) => {
